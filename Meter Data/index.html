@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power Utilization Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .meter-color-1 { background-color: #3b82f6; }
+        .meter-color-2 { background-color: #10b981; }
+        .meter-color-3 { background-color: #f59e0b; }
+        .meter-color-4 { background-color: #ef4444; }
+        .meter-color-5 { background-color: #8b5cf6; }
+        .meter-color-6 { background-color: #ec4899; }
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                left: -100%;
+                z-index: 10;
+            }
+            .sidebar.active {
+                left: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar w-64 bg-white shadow-lg">
+            <div class="p-4 gradient-bg text-white">
+                <h1 class="text-2xl font-bold flex items-center">
+                    <i class="fas fa-bolt mr-2"></i> Alpha Guardian
+                </h1>
+                <p class="text-blue-100 text-sm mt-1">Energy Monitoring Report</p>
+            </div>
+            <nav class="mt-6">
+                <div class="px-4 py-2 text-gray-500 uppercase text-xs font-semibold tracking-wider">Main</div>
+                <a href="#" class="flex items-center px-6 py-3 text-blue-600 bg-blue-50 border-l-4 border-blue-600">
+                    <i class="fas fa-chart-line mr-3"></i> Dashboard
+                </a>
+                <a href="#" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50">
+                    <i class="fas fa-history mr-3"></i> Historical Data
+                </a>
+                <a href="#" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50">
+                    <i class="fas fa-cog mr-3"></i> Settings
+                </a>
+                <div class="px-4 py-2 text-gray-500 uppercase text-xs font-semibold tracking-wider mt-4">Reports</div>
+                <a href="#" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50">
+                    <i class="fas fa-file-alt mr-3"></i> Monthly Report
+                </a>
+                <a href="#" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50">
+                    <i class="fas fa-chart-pie mr-3"></i> Analytics
+                </a>
+            </nav>
+            
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <!-- Header -->
+            <header class="bg-white shadow-sm">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <div class="flex items-center">
+                        <button id="sidebarToggle" class="md:hidden text-gray-500 focus:outline-none">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <h2 class="text-xl font-semibold text-gray-800 ml-4">Power Utilization Dashboard</h2>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" placeholder="Search..." class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <button class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-bell text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <main class="p-6">
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white rounded-xl shadow-md p-6 card-hover transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">Total Consumption</p>
+                                <h3 class="text-2xl font-bold mt-1">1,245,890 kWh</h3>
+                                <p class="text-green-500 text-sm mt-1"><i class="fas fa-arrow-up mr-1"></i> 12.5% from last month</p>
+                            </div>
+                            <div class="p-3 rounded-full bg-blue-50 text-blue-600">
+                                <i class="fas fa-bolt text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-6 card-hover transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">Peak Consumption</p>
+                                <h3 class="text-2xl font-bold mt-1">16,614 kWh</h3>
+                                <p class="text-sm mt-1">Meter 2 on 4/28/25</p>
+                            </div>
+                            <div class="p-3 rounded-full bg-green-50 text-green-600">
+                                <i class="fas fa-chart-line text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-6 card-hover transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">Average Daily Use</p>
+                                <h3 class="text-2xl font-bold mt-1">41,530 kWh</h3>
+                                <p class="text-red-500 text-sm mt-1"><i class="fas fa-arrow-down mr-1"></i> 3.2% from last month</p>
+                            </div>
+                            <div class="p-3 rounded-full bg-yellow-50 text-yellow-600">
+                                <i class="fas fa-chart-bar text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-md p-6 card-hover transition-all duration-300">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">Cost Estimate</p>
+                                <h3 class="text-2xl font-bold mt-1">$24,918</h3>
+                                <p class="text-sm mt-1">Based on $0.20/kWh</p>
+                            </div>
+                            <div class="p-3 rounded-full bg-purple-50 text-purple-600">
+                                <i class="fas fa-dollar-sign text-2xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Chart -->
+                <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800">Power Consumption & Peak Demand (April 2025)</h3>
+                        <div class="flex space-x-2">
+                            <!-- Data Type Toggle -->
+                            <div class="inline-flex rounded-md shadow-sm mr-4" role="group">
+                                <button id="toggleConsumption" type="button" class="px-3 py-1 text-sm bg-blue-600 text-white rounded-l-lg focus:z-10">
+                                    Consumption
+                                </button>
+                                <button id="toggleDemand" type="button" class="px-3 py-1 text-sm bg-white border border-gray-300 text-gray-700 rounded-r-md hover:bg-gray-50 focus:z-10">
+                                    Peak Demand
+                                </button>
+                            </div>
+                            <!-- Time Scale Toggle -->
+                            <div class="inline-flex rounded-md shadow-sm" role="group">
+                                <button class="px-3 py-1 text-sm bg-blue-600 text-white rounded-l-lg">Daily</button>
+                                <button class="px-3 py-1 text-sm bg-white border border-gray-300 text-gray-700 rounded-r-md hover:bg-gray-50">Weekly</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="mainChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Meter Comparison and Data Table -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Meter Comparison -->
+                    <div class="bg-white rounded-xl shadow-md p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-6">Meter Comparison</h3>
+                        <div class="chart-container">
+                            <canvas id="comparisonChart"></canvas>
+                        </div>
+                        <div class="mt-6 grid grid-cols-2 md:grid-cols-3 gap-4">
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 rounded-full meter-color-1 mr-2"></div>
+                                <span class="text-sm text-gray-600">Meter 1</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 rounded-full meter-color-2 mr-2"></div>
+                                <span class="text-sm text-gray-600">Meter 2</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 rounded-full meter-color-3 mr-2"></div>
+                                <span class="text-sm text-gray-600">Meter 3</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 rounded-full meter-color-4 mr-2"></div>
+                                <span class="text-sm text-gray-600">Meter 4</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 rounded-full meter-color-5 mr-2"></div>
+                                <span class="text-sm text-gray-600">Meter 5</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 rounded-full meter-color-6 mr-2"></div>
+                                <span class="text-sm text-gray-600">Meter 6</span>
+                            </div>
+                        </div>
+                    </div>
+
+<!-- Data Table -->
+<div class="bg-white rounded-xl shadow-md p-6">
+    <h3 class="text-lg font-semibold text-gray-800 mb-6">Recent Data (April 2025)</h3>
+    <div class="relative">
+        <!-- Scrollable table container -->
+        <div class="overflow-y-auto" style="max-height: 500px;">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50 sticky top-0">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Meter 1</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Meter 2</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Meter 3</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Meter 4</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Meter 5</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Meter 6</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    <!-- April 2025 Data -->
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/1/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,286</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,327</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">901</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,489</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,995</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,176</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/2/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,311</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,379</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">889</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,543</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,012</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,254</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/3/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,386</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15,367</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">836</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,498</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,987</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,189</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/4/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,079</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,397</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">772</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,512</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,001</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,212</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/5/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,774</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,289</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">635</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,487</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,998</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,187</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/6/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,803</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">12,280</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">572</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,499</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,010</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,199</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/7/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,292</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">13,022</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">841</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,501</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,987</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,201</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/8/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,304</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,249</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">830</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,498</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,995</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,198</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/9/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,301</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,235</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">875</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,512</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,012</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,212</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/10/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,293</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">12,657</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">890</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,489</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,989</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,189</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/11/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,077</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,169</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">775</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,497</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,997</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,197</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/12/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,781</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,302</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">639</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,510</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,010</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,210</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/13/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,806</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,260</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">519</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,486</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,986</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,186</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/14/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,285</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,235</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">893</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,499</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,999</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,199</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/15/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,301</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,264</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">895</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,512</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,012</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,212</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/16/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,314</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">12,554</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">896</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,487</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,987</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,187</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/17/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,309</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,381</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">768</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,496</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,996</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,196</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/18/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,268</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,328</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">772</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,511</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,011</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,211</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/19/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,772</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,335</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">634</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,489</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,989</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,189</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/20/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,029</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,245</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">514</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,498</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,998</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,198</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/21/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,047</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,422</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">891</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,510</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,010</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,210</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/22/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,044</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,303</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">774</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,487</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,987</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,187</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/23/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,559</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,336</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">901</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,495</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,995</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,195</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/24/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,070</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,355</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">770</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,512</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,012</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,212</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/25/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,488</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">14,278</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">879</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,489</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,989</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,189</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/26/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,590</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15,719</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">521</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,497</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,997</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,197</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/27/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,032</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">12,574</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">642</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,510</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,010</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,210</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/28/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,078</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">16,614</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">766</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,486</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,986</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,186</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/29/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,050</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">15,015</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">894</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,499</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1,999</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,199</td></tr>
+                    <tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">4/30/25</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,553</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">13,705</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">770</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,512</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2,012</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">9,212</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>        
+        
+    </div>
+</div>
+    <script>
+        // Toggle sidebar on mobile
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+
+        // Main Chart (Line Chart)
+        const mainCtx = document.getElementById('mainChart').getContext('2d');
+        const mainChart = new Chart(mainCtx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 30}, (_, i) => `4/${i+1}/25`),
+                datasets: [
+    {
+        label: 'Meter 1',
+        data: [2286,2311,2386,2079,1774,1803,2292,2304,2301,2293,2077,1781,1806,2285,2301,2314,2309,2268,1772,2029,2047,2044,2559,2070,2488,1590,2032,2078,2050,2553],
+        borderColor: '#3b82f6',
+        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+        tension: 0.3,
+        fill: true
+    },
+    {
+        label: 'Meter 2',
+        data: [14327,14379,15367,14397,14289,12280,13022,14249,14235,12657,14169,14302,14260,14235,14264,12554,14381,14328,14335,14245,14422,14303,14336,14355,14278,15719,12574,16614,15015,13705],
+        borderColor: '#10b981',
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        tension: 0.3,
+        fill: true
+    },
+    {
+        label: 'Meter 3',
+        data: [901,889,836,772,635,572,841,830,875,890,775,639,519,893,895,896,768,772,634,514,891,774,901,770,879,521,642,766,894,770],
+        borderColor: '#f59e0b',
+        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+        tension: 0.3,
+        fill: true
+    },
+    {
+        label: 'Meter 4',
+        data: [2489,2543,2498,2512,2487,2499,2501,2498,2512,2489,2497,2510,2486,2499,2512,2487,2496,2511,2489,2498,2510,2487,2495,2512,2489,2497,2510,2486,2499,2512],
+        borderColor: '#ef4444',
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        tension: 0.3,
+        fill: true
+    },
+    {
+        label: 'Meter 5',
+        data: [1995,2012,1987,2001,1998,2010,1987,1995,2012,1989,1997,2010,1986,1999,2012,1987,1996,2011,1989,1998,2010,1987,1995,2012,1989,1997,2010,1986,1999,2012],
+        borderColor: '#8b5cf6',
+        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+        tension: 0.3,
+        fill: true
+    },
+    {
+        label: 'Meter 6',
+        data: [9176,9254,9189,9212,9187,9199,9201,9198,9212,9189,9197,9210,9186,9199,9212,9187,9196,9211,9189,9198,9210,9187,9195,9212,9189,9197,9210,9186,9199,9212],
+        borderColor: '#ec4899',
+        backgroundColor: 'rgba(236, 72, 153, 0.1)',
+        tension: 0.3,
+        fill: true
+    }
+]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+    mode: 'index',
+    intersect: false,
+    callbacks: {
+        label: function(context) {
+            let label = context.dataset.label || '';
+            if (label) {
+                label += ': ';
+            }
+            if (context.parsed.y !== null) {
+                label += new Intl.NumberFormat('en-US').format(context.parsed.y) + ' kWh';
+            }
+            return label;
+        }
+    }
+}
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: {
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // Comparison Chart (Bar Chart)
+        const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+        const comparisonChart = new Chart(comparisonCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Meter 1', 'Meter 2', 'Meter 3', 'Meter 4', 'Meter 5', 'Meter 6'],
+                datasets: [{
+                    label: 'Average Consumption (kWh)',
+                    data: [2123, 14345, 742, 2489, 1995, 9176],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(16, 185, 129, 0.7)',
+                        'rgba(245, 158, 11, 0.7)',
+                        'rgba(239, 68, 68, 0.7)',
+                        'rgba(139, 92, 246, 0.7)',
+                        'rgba(236, 72, 153, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(16, 185, 129, 1)',
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(239, 68, 68, 1)',
+                        'rgba(139, 92, 246, 1)',
+                        'rgba(236, 72, 153, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            drawBorder: false
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
